@@ -8,8 +8,6 @@
 #include "Beacon.h"
 #include "Camera.h"
 
-class Message {
-public:
 #pragma pack(push, 1)
 
     struct M_Header {
@@ -19,6 +17,11 @@ public:
 
     };
 #pragma pack(pop)
+    
+    
+class Message {
+public:
+
 
     enum {
         _header_length = sizeof (M_Header)
@@ -53,10 +56,10 @@ public:
 
     void setHeader(NUM_CMD num_cmd);
     bool setBody(Beacon body);
-    bool setBody(Camera body);
+    bool setBody(C_Point body);
 
     //void setBody(Camera body);
-    Camera getBody();
+    C_Point getBody();
 
 
     //    bool makeData(NUM_CMD num_cmd, M_RectDetect _rectDetect);
@@ -72,7 +75,7 @@ private:
 
     M_Header header;
     Beacon _beacon;
-    Camera _camera;
+    C_Point _camera;
 };
 
 #endif

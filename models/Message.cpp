@@ -361,7 +361,7 @@ bool Message::setBody(Beacon body) {
     return encode_body();
 }
 
-bool Message::setBody(Camera body){
+bool Message::setBody(C_Point body){
     _camera = body;
     setHeader(CMD_GET_DATA_BEACON);
     encode_header();
@@ -369,8 +369,10 @@ bool Message::setBody(Camera body){
 }
 
 
-Camera Message::getBody() {
-    //return nullptr;
+C_Point Message::getBody() {
+    C_Point cam;
+    memcpy(&cam, data_, sizeof(C_Point));
+    return cam;
 }
 
 int Message::getNumCMD() {

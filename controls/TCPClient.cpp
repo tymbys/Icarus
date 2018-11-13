@@ -4,7 +4,8 @@ using boost::asio::ip::tcp;
 using namespace std;
 
 template <typename SyncReadStream, typename MutableBufferSequence>
-void readWithTimeout(SyncReadStream& s, const MutableBufferSequence& buffers, const boost::asio::deadline_timer::duration_type& expiry_time) {
+size_t readWithTimeout(SyncReadStream& s, const MutableBufferSequence& buffers, const boost::asio::deadline_timer::duration_type& expiry_time) {
+    size_t len = 0;
     boost::optional<boost::system::error_code> timer_result;
     boost::asio::deadline_timer timer(s.get_io_service());
     timer.expires_from_now(expiry_time);
@@ -12,20 +13,45 @@ void readWithTimeout(SyncReadStream& s, const MutableBufferSequence& buffers, co
         timer_result.reset(error); });
 
     boost::optional<boost::system::error_code> read_result;
-    boost::asio::async_read(s, buffers, [&read_result] (const boost::system::error_code& error, size_t) {
+
+
+    boost::asio::async_read(s, buffers, [&read_result, &len] (const boost::system::error_code& error, size_t N) {
+        len = N;
+
+        printf("N: %d\n", N);
         read_result.reset(error); });
 
+
+    boost::system::error_code ec;
     s.get_io_service().reset();
+    s.get_io_service().poll_one(ec);
+
     while (s.get_io_service().run_one()) {
-        if (read_result)
+        cout << "1";
+        if (read_result) {
+            cout << "timer.cancel" << endl;
             timer.cancel();
-        else if (timer_result)
+            break;
+
+        } else if (timer_result) {
+            cout << "s.cancel" << endl;
             s.cancel();
+            //s.close();
+            break;
+
+        }
     }
 
-    if (*read_result)
-        throw boost::system::system_error(*read_result);
+
+
+
+    cout << "2" << endl;
+    return len;
+
+    //    if (*read_result)
+    //        throw boost::system::system_error(*read_result);
 }
+
 
 TCPClient::TCPClient(boost::asio::io_service& io_service, tcp::resolver::iterator endpoint_iterator) : io_service_(io_service), socket_(io_service) {
     do_connect(endpoint_iterator);
@@ -48,14 +74,19 @@ void TCPClient::close() {
 }
 
 void TCPClient::do_connect(tcp::resolver::iterator endpoint_iterator) {
-    boost::asio::async_connect(socket_, endpoint_iterator,
-            [this](boost::system::error_code ec, tcp::resolver::iterator) {
-                if (!ec) {
-                    //do_read_header();
-                    //do_read_body();
-                    do_write();
-                }
-            });
+    try {
+
+        boost::asio::async_connect(socket_, endpoint_iterator,
+                [this](boost::system::error_code ec, tcp::resolver::iterator) {
+                    if (!ec) {
+                        //do_read_header();
+                        //do_read_body();
+                        do_write();
+                    }
+                });
+    } catch (...) {
+        cout << "unexpected exception" << endl;
+    }
 }
 
 void TCPClient::do_read_body() {
@@ -66,43 +97,58 @@ void TCPClient::do_read_body() {
     //    if (r_ec) {
     //        
     //    }
+
+    //boost::asio::const_buffers_1 b(&read_msg_, sizeof (read_msg_));
+
     
-    
-    readWithTimeout(socket_, boost::asio::buffer(&read_msg_, sizeof (Beacon)), 1);
+    boost::system::error_code read_result;
+    read_len =  socket_.read_some(
+            boost::asio::buffer(&read_msg_, sizeof (read_msg_)),
+            read_result);
+
+    //read_len = readWithTimeout(socket_, boost::asio::buffer(&read_msg_, sizeof (read_msg_)), boost::posix_time::seconds(1));
 
 
-    //    Semaphore r_sem;
-    //    boost::system::error_code r_ec;
-    //
-    //    boost::asio::async_read(socket_,
-    //            boost::asio::buffer(&read_msg_, sizeof (read_msg_)),
-    //            [this/*, &r_ec, &r_sem*/](boost::system::error_code ec, std::size_t /*length*/) {
-    //
-    //                //r_ec = ec;
-    //                //r_sem.notify();
-    //
-    //                if (!ec) {
-    //                    std::cout << std::hex;
-    //                    //std::cout.write(reinterpret_cast<char  *>(read_msg_.data), 1);
-    //                    //read_msg_[1] = 0;
-    //                    //read_msg_[2] = 0;
-    //                    //read_msg_[3] = 0;
-    //                    std::cout << (int) read_msg_[0];
-    //                    std::cout << "\n";
-    //
-    //                    //                    switch (read_msg_.b1) {
-    //                    //
-    //                    //                    }
-    //
-    //
-    //
-    //                    //do_read_body();
-    //                } else {
-    //                    //socket_.close();
-    //                }
-    //                socket_.close();
-    //
-    //            });
+    printf("read_len: %d\n", read_len);
+    for (int i = 0; i < read_len; i++) {
+        printf("0x%02hhX ", read_msg_[i]);
+    }
+
+    socket_.close();
+
+
+    //        Semaphore r_sem;
+    //        boost::system::error_code r_ec;
+    //    
+    //        boost::asio::async_read(socket_,
+    //                boost::asio::buffer(&read_msg_, sizeof (read_msg_)),
+    //                [this/*, &r_ec, &r_sem*/](boost::system::error_code ec, std::size_t /*length*/) {
+    //    
+    //                    //r_ec = ec;
+    //                    //r_sem.notify();
+    //    
+    //                    if (!ec) {
+    //                        std::cout << std::hex;
+    //                        //std::cout.write(reinterpret_cast<char  *>(read_msg_.data), 1);
+    //                        //read_msg_[1] = 0;
+    //                        //read_msg_[2] = 0;
+    //                        //read_msg_[3] = 0;
+    //                        std::cout << (int) read_msg_[0];
+    //                        std::cout << "\n";
+    //    
+    //                        //                    switch (read_msg_.b1) {
+    //                        //
+    //                        //                    }
+    //    
+    //    
+    //    
+    //                        //do_read_body();
+    //                    } else {
+    //                        //socket_.close();
+    //                    }
+    //                    socket_.close();
+    //    
+    //                });
 
     /*    
             if (!r_sem.wait_for(std::chrono::seconds(3))) // wait for 3 seconds
@@ -137,4 +183,30 @@ void TCPClient::do_write() {
     //socket_.close();
 
 
+}
+
+//tcp::socket TCPClient::get(){
+//    return socket_;
+//}
+
+size_t TCPClient::getReadData(char *msg) {
+
+    memcpy(msg, read_msg_, read_len);
+
+    return read_len;
+}
+
+size_t TCPClient::getReadLen(){
+    return read_len;
+}
+
+size_t TCPClient::getReadBodyData(char *msg) {
+
+    memcpy(msg, read_msg_ + sizeof(M_Header), read_len - sizeof(M_Header));
+
+    return read_len - sizeof(M_Header);
+}
+
+size_t TCPClient::getReadBodyLen(){
+    return read_len - sizeof(M_Header);
 }

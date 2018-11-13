@@ -64,6 +64,10 @@ void MainSingle::InitRemoteBeacons(string json) {
         }
     }
 
+    StartCalibrationCamera();
+
+    exit(0);
+
 
     _processing_beacon_clients = thread([this]() {
 
@@ -71,29 +75,30 @@ void MainSingle::InitRemoteBeacons(string json) {
         is_run_processing_beacon_clients = true;
 
         Beacon beacon;
-//        beacon.data[0] = 0xDE;
-//        beacon.data[1] = 0xED;
-//        beacon.data[2] = 0xBE;
-//        beacon.data[3] = 0xEF;
-//        beacon.data[4] = 0x00;
-//        beacon.data[5] = 0x02;
-//        beacon.data[6] = 0x00;
-//        beacon.data[7] = 0;
-        beacon.data[0]=0;
-        beacon.data[1]=1;
-        
+        //        beacon.data[0] = 0xDE;
+        //        beacon.data[1] = 0xED;
+        //        beacon.data[2] = 0xBE;
+        //        beacon.data[3] = 0xEF;
+        //        beacon.data[4] = 0x00;
+        //        beacon.data[5] = 0x02;
+        //        beacon.data[6] = 0x00;
+        //        beacon.data[7] = 0;
+        beacon.data[0] = 0;
+        beacon.data[1] = 0;
+
         Message m;
-        
+
         m.setBody(beacon);
 
         while (is_run_processing_beacon_clients) {
             beacon.data[1] = beacon.data[1] ? 0 : 1;
-            m.setBody(beacon);
+                    m.setBody(beacon);
             for (auto b : _remore_beacons) {
-                
-                        SendMesageToTCPServer(b.ip, b.port, m);
+
+                //SendMesageToTCPServer(b.ip, b.port, m, NULL, 0, NULL);
+                SendMesageToTCPServer(b.ip, b.port, m);
                         //MainSingle::get().SendMesageToTCPServer("192.168.1.105", "10000", beacon);
-                
+
                         sleep(delay_processing);
             }
         }
@@ -108,14 +113,28 @@ void MainSingle::InitRemoteBeacons(string json) {
 
 }
 
-
-void MainSingle::StartCalibrationCamera(){
+void MainSingle::StartCalibrationCamera() {
     Message m;
-    
-    m.setHeader(Message::CMD_INIT_CAMERA);
-    
-}
+    char rx[100];
 
+    m.setHeader(Message::CMD_INIT_CAMERA);
+
+    for (auto b : _remore_beacons) {
+
+        if (b.type == 2) {
+            //size_t len = SendMesageToTCPServer(b.ip, b.port, m);
+            SendMesageToTCPServer(b.ip, b.port, m);
+            //Camera m.getBody();
+            //MainSingle::get().SendMesageToTCPServer("192.168.1.105", "10000", beacon);
+            //            for (int i = 0; i < len; i++) {
+            //                printf("0x%X02 ", rx[i]);
+            //            }
+
+            sleep(delay_processing);
+        }
+    }
+
+}
 
 void MainSingle::Init() {
     InitWebServer(8080);
@@ -135,6 +154,8 @@ void MainSingle::setSensors(string json) {
     handler->setValue(json);
 }
 
+//size_t MainSingle::SendMesageToTCPServer(string ip, string port, Message &mesage, char *tx_data_body, size_t tx_len, char *rx_data) {
+
 void MainSingle::SendMesageToTCPServer(string ip, string port, Message &mesage) {
     boost::asio::io_service io_service;
     tcp::resolver resolver(io_service);
@@ -142,15 +163,73 @@ void MainSingle::SendMesageToTCPServer(string ip, string port, Message &mesage) 
     cout << "ip: " << ip << ", port: " << port << endl;
     //auto endpoint_iterator = resolver.resolve({"192.168.1.111", "10000"});
     TCPClient c(io_service, endpoint_iterator);
-    
-    
-    
-    c.write(mesage);
-    io_service.run();
-    
 
+
+
+    c.write(mesage);
+    //boost::asio::write(c.get(), boost::asio::buffer(tx_data_body, tx_len));
+
+    try {
+        io_service.run();
+    } catch (...) {
+        cout << "Error conekted to " << ip << ": " << port << endl;
+    }
+
+    _points_from_camera.clear();
+
+    size_t read_len = c.getReadBodyLen();
+    if (read_len > 0) {
+        char *byff = (char*)malloc(read_len);
+        c.getReadBodyData(byff);
+        
+        
+        cout << endl;
+        for(int i =0; i< read_len/sizeof(C_Point); i++ ){
+            C_Point *p = (C_Point *)&byff[i*sizeof(C_Point)];
+            C_Point cam;
+            
+            cam.alpha = p->alpha;
+            cam.beta = p->beta;
+            
+            cout << i<< " | alpha: " << cam.alpha << "| beta" << cam.beta  << endl;
+            
+        //_points_from_camera.push_back(cam);
+            //_points_from_camera.push_back(*p);
+            _points_from_camera.push_back(*(C_Point *)&byff[i*sizeof(C_Point)]);
+        }
+        
+        free(byff);
+        cout << endl;
+        for(auto i: _points_from_camera ){
+            cout << " | alpha: " << i.alpha << "| beta" << i.beta  << endl;
+        }
+    }
+    //return c.getReadData(rx_data);
 
 
     //    std::thread t([&io_service]() {
     //        io_service.run(); });
 }
+
+//void MainSingle::SendMesageToCamera(string ip, string port, Message &mesage) {
+//    boost::asio::io_service io_service;
+//    tcp::resolver resolver(io_service);
+//    auto endpoint_iterator = resolver.resolve({ip.c_str(), port.c_str()});
+//    cout << "ip: " << ip << ", port: " << port << endl;
+//    //auto endpoint_iterator = resolver.resolve({"192.168.1.111", "10000"});
+//    TCPClient c(io_service, endpoint_iterator);
+//
+//
+//
+//    c.write(mesage);
+//    try {
+//        io_service.run();
+//    } catch (...) {
+//        cout << "Error conekted to "<< ip<< ": " << port << endl;
+//    }
+//
+//
+//
+//    //    std::thread t([&io_service]() {
+//    //        io_service.run(); });
+//}

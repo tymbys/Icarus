@@ -28,6 +28,7 @@ public:
     void Init();
     
     void SendMesageToTCPServer(string ip, string port, Message &mesage);
+    //size_t SendMesageToTCPServer(string ip, string port, Message &mesage, char *tx_data_body, size_t tx_len , char *rx_data);
     
     thread &GetServerThread();
     void setSensors(string json);
@@ -47,6 +48,7 @@ private:
     
     
     vector<RemoteBeacon> _remore_beacons;
+    POINTS _points_from_camera;
 };
 
 #endif /* MAINSINGLE_H */

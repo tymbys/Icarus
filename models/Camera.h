@@ -1,11 +1,15 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-struct Camera{
+#include <vector>
+
+struct C_Point{
     double alpha;
     double beta; 
 };
 
+
+#define POINTS std::vector<C_Point>
 
 #endif /* CAMERA_H */
 
