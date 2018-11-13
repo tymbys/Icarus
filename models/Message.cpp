@@ -219,6 +219,20 @@ bool Message::encode_body() {
 
             break;
         }
+        case CMD_GET_DATA_CAMERA:
+        {
+            p = (char *) data_p;
+            //body_length_ = sizeof(rectDetect);
+
+            break;
+        }
+//        case CMD_GET_DATA_CAMERA:
+//        {
+//            p = (char *) data_p;
+//            //body_length_ = sizeof(rectDetect);
+//
+//            break;
+//        }
         
             //        case CMD_RECT_DETECT:
             //        {
@@ -280,9 +294,32 @@ void Message::setHeader(NUM_CMD num_cmd) {
             break;
         }
         
+        case CMD_GET_DATA_CAMERA:
+        {
+            _body_length = 2;
+            //data_p = &data_[_header_length];
+            encode_header();
+            
+            //*data_p = (uint16_t)(CMD_GET_DATA_CAMERA);
+            //uint16_t data = (uint16_t )(CMD_GET_DATA_CAMERA);
+            data_[_header_length ] = 0x00ff & CMD_GET_DATA_CAMERA ;//* ((char *) &data);
+            data_[_header_length +1] = 0x00ff & (CMD_GET_DATA_CAMERA >> 8)  ;
+
+            break;
+        }
+        
         case CMD_INIT_CAMERA:
         {
-            _body_length = 0;
+            _body_length = 2;
+            encode_header();
+            //uint16_t data = (uint16_t )(CMD_GET_DATA_CAMERA);
+            //data_[_header_length ] = * ((char *) &data);
+            
+            data_[_header_length ] = 0x00ff & CMD_INIT_CAMERA ;//* ((char *) &data);
+            data_[_header_length +1] = 0x00ff & (CMD_INIT_CAMERA >> 8)  ;
+            
+            //data_p = &data_[_header_length];            
+            //*data_p = (uint16_t)(CMD_INIT_CAMERA);
 
             break;
         }
@@ -361,18 +398,24 @@ bool Message::setBody(Beacon body) {
     return encode_body();
 }
 
-bool Message::setBody(C_Point body){
-    _camera = body;
-    setHeader(CMD_GET_DATA_BEACON);
-    encode_header();
-    return encode_body();
-}
+//bool Message::setBody(C_Point body){
+//    _camera = body;
+//    setHeader(CMD_GET_DATA_BEACON);
+//    encode_header();
+//    return encode_body();
+//}
 
+//bool Message::setBody(char *body, size_t len){
+//    //data_p = body;//data_[_header_length];
+//    setHeader(CMD_GET_DATA_CAMERA);
+//    encode_header();
+//    return encode_body();
+//}
 
-C_Point Message::getBody() {
-    C_Point cam;
-    memcpy(&cam, data_, sizeof(C_Point));
-    return cam;
+POINTS Message::getBody() {
+//    C_Point cam;
+//    memcpy(&cam, data_, sizeof(C_Point));
+//    return cam;
 }
 
 int Message::getNumCMD() {

@@ -40,6 +40,8 @@ private:
     void do_connect(tcp::resolver::iterator endpoint_iterator);
     void do_read_body();
     void do_write();
+    
+    //void SetDataToMessage();
 
 
 private:

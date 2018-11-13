@@ -52,7 +52,6 @@ size_t readWithTimeout(SyncReadStream& s, const MutableBufferSequence& buffers, 
     //        throw boost::system::system_error(*read_result);
 }
 
-
 TCPClient::TCPClient(boost::asio::io_service& io_service, tcp::resolver::iterator endpoint_iterator) : io_service_(io_service), socket_(io_service) {
     do_connect(endpoint_iterator);
 }
@@ -100,19 +99,19 @@ void TCPClient::do_read_body() {
 
     //boost::asio::const_buffers_1 b(&read_msg_, sizeof (read_msg_));
 
-    
+
     boost::system::error_code read_result;
-    read_len =  socket_.read_some(
+    read_len = socket_.read_some(
             boost::asio::buffer(&read_msg_, sizeof (read_msg_)),
             read_result);
 
     //read_len = readWithTimeout(socket_, boost::asio::buffer(&read_msg_, sizeof (read_msg_)), boost::posix_time::seconds(1));
 
 
-    printf("read_len: %d\n", read_len);
-    for (int i = 0; i < read_len; i++) {
-        printf("0x%02hhX ", read_msg_[i]);
-    }
+//    printf("read_len: %d\n", read_len);
+//    for (int i = 0; i < read_len; i++) {
+//        printf("0x%02hhX ", read_msg_[i]);
+//    }
 
     socket_.close();
 
@@ -196,17 +195,18 @@ size_t TCPClient::getReadData(char *msg) {
     return read_len;
 }
 
-size_t TCPClient::getReadLen(){
+size_t TCPClient::getReadLen() {
     return read_len;
 }
 
 size_t TCPClient::getReadBodyData(char *msg) {
 
-    memcpy(msg, read_msg_ + sizeof(M_Header), read_len - sizeof(M_Header));
+    memcpy(msg, read_msg_ + sizeof (M_Header), read_len - sizeof (M_Header));
 
-    return read_len - sizeof(M_Header);
+    return read_len - sizeof (M_Header);
 }
 
-size_t TCPClient::getReadBodyLen(){
-    return read_len - sizeof(M_Header);
+size_t TCPClient::getReadBodyLen() {
+    return read_len - sizeof (M_Header);
 }
+

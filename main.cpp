@@ -31,13 +31,15 @@ int main(int argc, char** argv) {
 
     while (1) {
         ostringstream ss;
-        ss << "[{\"id\":1, \"dx\": " << i << ", \"dy\": 1}, {\"id\": 2,\"dx\": 2, \"dy\": 2}]";
-        ss.flush();
-        string _sensors = ss.str();
-        //handler->setSensors(_sensors);
-        MainSingle::get().setSensors(_sensors);
-        //cout << "_sensors: "<< _sensors << endl;
-        i++;
+        //ss << "[{\"id\":1, \"dx\": " << i << ", \"dy\": 1}, {\"id\": 2,\"dx\": 2, \"dy\": 2}]";
+        
+//        ss << "[{\"id\":1, \"dx\": 0, \"dy\": 0},{\"id\":2, \"dx\": -7, \"dy\": -4.25},{\"id\":3, \"dx\": -7, \"dy\": -13.7447}]";
+//        
+//        ss.flush();
+//        string _sensors = ss.str();        
+//        MainSingle::get().setSensors(_sensors);
+//        //cout << "_sensors: "<< _sensors << endl;
+//        i++;
 
         //beacon.data[7] = beacon.data[7] ? 0 : 1;
 //

@@ -6,6 +6,7 @@
 #include "models/Beacon.h"
 #include "models/RemoteBeacon.h"
 #include "models/Message.h"
+#include "models/Camera.h"
 #include <unistd.h>
 #include <string>
 #include <vector>
@@ -27,11 +28,12 @@ public:
     
     void Init();
     
-    void SendMesageToTCPServer(string ip, string port, Message &mesage);
+    bool SendMesageToTCPServer(string ip, string port, Message &mesage);
     //size_t SendMesageToTCPServer(string ip, string port, Message &mesage, char *tx_data_body, size_t tx_len , char *rx_data);
     
     thread &GetServerThread();
     void setSensors(string json);
+    void ConvertDataToPoints(TCPClient &c);
     
 private:
     thread _web_server;
@@ -49,6 +51,8 @@ private:
     
     vector<RemoteBeacon> _remore_beacons;
     POINTS _points_from_camera;
+    
+    NaviMath _navi_math;
 };
 
 #endif /* MAINSINGLE_H */

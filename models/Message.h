@@ -56,10 +56,12 @@ public:
 
     void setHeader(NUM_CMD num_cmd);
     bool setBody(Beacon body);
-    bool setBody(C_Point body);
+    //bool setBody(C_Point body);
+    
+    //bool setBody(POINTS body);
 
     //void setBody(Camera body);
-    C_Point getBody();
+    POINTS getBody();
 
 
     //    bool makeData(NUM_CMD num_cmd, M_RectDetect _rectDetect);
@@ -70,6 +72,8 @@ public:
 
 private:
     char data_[_header_length + _max_body_length];
+    char *data_p;
+    
     std::size_t _body_length;
     int _num_cmd;
 
