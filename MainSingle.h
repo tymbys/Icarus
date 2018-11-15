@@ -40,7 +40,7 @@ private:
     
     thread _processing_beacon_clients;
     bool is_run_processing_beacon_clients;
-    uint8_t delay_processing;
+    useconds_t delay_processing;
     
     
     shared_ptr<PrintfLogger> logger;

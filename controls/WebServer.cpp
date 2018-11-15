@@ -57,10 +57,10 @@ void MyHandler::setValue(int value) {
 
 void MyHandler::setValue(string value) {
     _currentSetValue = value;
-    cout  <<__func__ << endl;
+    //cout  <<__func__ << endl;
    for (auto c : _connections) {
         c->send(_currentSetValue.c_str());
-        cout << "_currentSetValue: " <<_currentSetValue << endl;
+        //cout << "_currentSetValue: " <<_currentSetValue << endl;
     }
 }
 

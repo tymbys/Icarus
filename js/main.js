@@ -77,6 +77,13 @@ function UpdateSensor(Sensors) {
 }
 ;
 
+function UpdateCalibration(Sensors) {
+
+    $("#val_calibration").val( JSON.stringify(Sensors));
+
+}
+;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -135,7 +142,8 @@ function onMessage(evt)
 {
     console.log(evt.data);
     _sensors = JSON.parse(evt.data);
-    UpdateSensor(_sensors);
+    UpdateSensor(_sensors["coordinates"]);
+    UpdateCalibration(_sensors["calibration"]);
     
 }
 function onError(evt)
