@@ -35,6 +35,8 @@ public:
     void setSensors(string json);
     void ConvertDataToPoints(TCPClient &c);
     
+    void Calc();
+    
 private:
     thread _web_server;
     

@@ -108,10 +108,10 @@ void TCPClient::do_read_body() {
     //read_len = readWithTimeout(socket_, boost::asio::buffer(&read_msg_, sizeof (read_msg_)), boost::posix_time::seconds(1));
 
 
-//    printf("read_len: %d\n", read_len);
-//    for (int i = 0; i < read_len; i++) {
-//        printf("0x%02hhX ", read_msg_[i]);
-//    }
+    printf("read_len: %d\n", read_len);
+    //    for (int i = 0; i < read_len; i++) {
+    //        printf("0x%02hhX ", read_msg_[i]);
+    //    }
 
     socket_.close();
 
@@ -201,12 +201,17 @@ size_t TCPClient::getReadLen() {
 
 size_t TCPClient::getReadBodyData(char *msg) {
 
-    memcpy(msg, read_msg_ + sizeof (M_Header), read_len - sizeof (M_Header));
+    if (read_len >= sizeof (M_Header)) {
+        memcpy(msg, read_msg_ + sizeof (M_Header), read_len - sizeof (M_Header));
 
-    return read_len - sizeof (M_Header);
+        return read_len - sizeof (M_Header);
+    }
+
+    return 0;
 }
 
 size_t TCPClient::getReadBodyLen() {
-    return read_len - sizeof (M_Header);
+    if (read_len <= 0)return 0;
+    else if (read_len >= sizeof (M_Header)) return read_len - sizeof (M_Header);
 }
 

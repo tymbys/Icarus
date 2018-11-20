@@ -79,7 +79,22 @@ function UpdateSensor(Sensors) {
 
 function UpdateCalibration(Sensors) {
 
-    $("#val_calibration").val( JSON.stringify(Sensors));
+    //$("#val_calibration").val( JSON.stringify(Sensors));
+    
+    $("#c1_alpha1").html( JSON.stringify(Sensors["c1_alpha1"]));
+    $("#c1_beta1").html( JSON.stringify(Sensors["c1_beta1"]));
+    $("#c1_alpha2").html( JSON.stringify(Sensors["c1_alpha2"]));
+    $("#c1_beta2").html( JSON.stringify(Sensors["c1_beta2"]));
+    $("#c1_alpha3").html( JSON.stringify(Sensors["c1_alpha3"]));
+    $("#c1_beta3").html( JSON.stringify(Sensors["c1_beta3"]));
+    
+    $("#c2_alpha1").html( JSON.stringify(Sensors["c2_alpha1"]));
+    $("#c2_beta1").html( JSON.stringify(Sensors["c2_beta1"]));
+    $("#c2_alpha2").html( JSON.stringify(Sensors["c2_alpha2"]));
+    $("#c2_beta2").html( JSON.stringify(Sensors["c2_beta2"]));
+    $("#c2_alpha3").html( JSON.stringify(Sensors["c2_alpha3"]));
+    $("#c2_beta3").html( JSON.stringify(Sensors["c2_beta3"]));
+    
 
 }
 ;

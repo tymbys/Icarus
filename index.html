@@ -12,7 +12,7 @@
         <script src="js/jquery-1.11.3.min.js"></script>
         <script src="js/jquery.mobile-1.4.5.min.js"></script>
         <script src="js/main.js"></script>
-        
+
         <script language="javascript" type="text/javascript">
 
         </script>
@@ -20,10 +20,7 @@
     <body>
         <!---------STARTPAGE-------->
         <div data-role="page" id="STARTPAGE">
-            <div data-role="panel" id="overlayPanel" data-display="overlay" data-theme="b">
-
-                <a href="#MAPS" onclick="ShowMaps();" class="ui-btn ui-corner-all ui-icon-gear ui-btn-icon-left">Maps</a>
-                <a href="#SETINGS" onclick="ShowSetings();" class="ui-btn ui-corner-all ui-icon-gear ui-btn-icon-left">Setings</a>
+            <div data-role="panel" id="overlayPanel" data-display="overlay" data-theme="b">               
                 <a href="#ABOUT" class="ui-btn ui-corner-all ui-icon-user ui-btn-icon-left">About</a>
 
 
@@ -42,24 +39,67 @@
             </div>
 
             <div data-role="main" class="ui-content" data-theme="a"  data-position="inline">
-                                
+
                 <div class="ui-body ui-body-a ui-corner-all" id="person" >
 
 
 
-                    <div id="for_calibration">
+                    <div id="for_calibration" style="display: none;">
                         <textarea id="val_calibration"></textarea>
                     </div>
-                    
+
+
+                    <div>
+                        <div> Calibration data: </div>
+                        <table data-role="table" data-mode="reflow" class="ui-responsive table-stroke ui-responsive" style=" color: #00BFFF;">
+                            <thead>
+                                <tr >
+                                    <th style="width: 30px;">num camera</th>
+                                    <th style="width: 15%;">alpha1</th>
+                                    <th style="width: 15%;">beta1</th>
+                                    <th style="width: 15%;">alpha2</th>
+                                    <th style="width: 15%;">beta2</th> 
+                                    <th style="width: 15%;">alpha3</th>
+                                    <th style="width: 15%;">beta3</th> 
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td id="c1_alpha1"></td>
+                                    <td id="c1_beta1"></td>
+                                    <td id="c1_alpha2"></td>
+                                    <td id="c1_beta2"></td>
+                                    <td id="c1_alpha3"></td>
+                                    <td id="c1_beta3"></td>
+
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td id="c2_alpha1"></td>
+                                    <td id="c2_beta1"></td>
+                                    <td id="c2_alpha2"></td>
+                                    <td id="c2_beta2"></td>
+                                    <td id="c2_alpha3"></td>
+                                    <td id="c2_beta3"></td>
+
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <br>
                     <div id="forTable">
+                        <div> Beacon offset: </div>
                         <table data-role="table" id="mtable_file" data-mode="reflow" class="ui-responsive table-stroke ui-responsive">
                             <thead>
                                 <tr >
                                     <th data-priority="1" style="width: 30px;">#</th>
-                                    <th data-priority="2">ID Sensor</th>
-                                    <th data-priority="3">dX</th>
-                                    <th data-priority="4">dY</th>
-                                    <th data-priority="5" style="width: 200px;">data</th> 
+                                    <th data-priority="2" style="width: 10%;">ID Sensor</th>
+                                    <th data-priority="3" style="width: 40%;">dX</th>
+                                    <th data-priority="4" style="width: 40%;">dY</th>
+                                    <th data-priority="5" style="width: 10%;">date</th> 
                                 </tr>
                             </thead>
                             <tbody>
@@ -78,7 +118,7 @@
             </div>
         </div>
 
-        
+
         <div id="output"></div>
     </body>
 

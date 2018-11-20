@@ -15,19 +15,19 @@ int main(int argc, char** argv) {
     MainSingle::get().Init();
 
     thread &Server = MainSingle::get().GetServerThread();
-    cout << "Server.join()" << endl;
+//    cout << "Server.join()" << endl;
 
 
-    int i = 0;
-    Beacon beacon;
-    beacon.data[0] = 0xDE;
-    beacon.data[1] = 0xED;
-    beacon.data[2] = 0xBE;
-    beacon.data[3] = 0xEF;
-    beacon.data[4] = 0x00;
-    beacon.data[5] = 0x02;
-    beacon.data[6] = 0x00;
-    beacon.data[7] = 0;
+//    int i = 0;
+//    Beacon beacon;
+//    beacon.data[0] = 0xDE;
+//    beacon.data[1] = 0xED;
+//    beacon.data[2] = 0xBE;
+//    beacon.data[3] = 0xEF;
+//    beacon.data[4] = 0x00;
+//    beacon.data[5] = 0x02;
+//    beacon.data[6] = 0x00;
+//    beacon.data[7] = 0;
 
     while (1) {
         ostringstream ss;
