@@ -242,7 +242,7 @@ void MainSingle::Calc() {
     double c2_alpha2 = -0.315793;
     double c2_alpha3 = -1.57;
     
-    double base = 1.325f;
+    double base = 833.0f;
 
     double alpha1;
     double beta1;
