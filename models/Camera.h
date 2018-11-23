@@ -31,8 +31,11 @@ public:
 	CamLocation GetCameraLocation(double Alpha1, double Beta1, double Alpha2, double Beta2, double Base);
 	LedLocation GetLedLocation(double Phi1, double Phi2);
 	void		SetCamLocation(CamLocation L);
+
+CamLocation Camera_Location={0};
+
 private:
-	CamLocation Camera_Location={0};
+	//CamLocation Camera_Location={0};
 
 
 };

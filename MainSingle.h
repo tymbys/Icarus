@@ -25,6 +25,7 @@ public:
     void InitWebServer(int port);
     void InitRemoteBeacons(string json);
     void StartCalibrationCamera();
+    void TestCalibrationCamera();
     
     void Init();
     
