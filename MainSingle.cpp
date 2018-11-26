@@ -72,9 +72,9 @@ void MainSingle::InitRemoteBeacons(string json) {
 
     //exit(0);
 
-    Calc();
+    //Calc();
 
-    //TestCalibrationCamera();
+    TestCalibrationCamera();
     //exit(0);
 
 
@@ -93,7 +93,7 @@ void MainSingle::InitRemoteBeacons(string json) {
         //        beacon.data[6] = 0x00;
         //        beacon.data[7] = 0;
         beacon.data[0] = 0;
-        beacon.data[1] = 1;
+        beacon.data[1] = 0;
 
         Message m;
 
@@ -123,7 +123,7 @@ void MainSingle::InitRemoteBeacons(string json) {
                 if (b.type == 1) {
 
                     m.setBody(beacon);
-                    //SendMesageToTCPServer(b.ip, b.port, m);
+                            //SendMesageToTCPServer(b.ip, b.port, m);
 
                 } else if (b.type == 2) {
                     m.setHeader(Message::CMD_GET_DATA_CAMERA);
@@ -150,10 +150,10 @@ void MainSingle::InitRemoteBeacons(string json) {
                                 //Phi1 =  abs(Phi1 - 0.268931351734);
                                 //Phi2 = point.alpha;
                                 //Phi2 =  abs(-1.0f*Phi2 + 2.65155555556);
-                                isPoint |= b.status;      
-                                
-                                Phi1 = point.alpha;
-                                //Phi1 =  -1.0f*Phi1 + 2.8;
+                                isPoint |= b.status;
+
+                                        Phi1 = point.alpha;
+                                        //Phi1 =  -1.0f*Phi1 + 2.8;
 
                             } else if (b.status == isCam2 && isOk) {
                                 //Phi2 = point.alpha;
@@ -161,42 +161,44 @@ void MainSingle::InitRemoteBeacons(string json) {
                                 //Phi1 = point.alpha;
                                 //Phi1 =  abs(-1.0f*Phi1 + 0.436111111111);
                                 isPoint |= b.status;
-                                
-                                Phi2 = point.alpha;
-                                //Phi2 =  -1.0f*Phi2 + 0.436111111111;
+
+                                        Phi2 = point.alpha;
+                                        //Phi2 =  -1.0f*Phi2 + 0.436111111111;
                             }
 
 
                             if (isPoint == isCamAll) {
 
                                 id++;
-                                
-                                NaviMath::LedLocation led_colation;
-                                led_colation.y1 = _navi_math.Camera_Location.x2/(tan(Phi2) - tan(Phi1));
-                                led_colation.x1 = - led_colation.y1 * tan(Phi1);
 
-                                //!NaviMath::LedLocation led_colation = _navi_math.GetLedLocation(Phi1, Phi2);
-                                //NaviMath::LedLocation led_colation = _navi_math.GetLedLocation(Phi2, Phi1);
+//                                        NaviMath::LedLocation led_colation;
+//                                        led_colation.y1 = _navi_math.Camera_Location.x2 / (tan(Phi2) - tan(Phi1));
+//                                        led_colation.x1 = -led_colation.y1 * tan(Phi1);
+
+                                        //!NaviMath::LedLocation led_colation = _navi_math.GetLedLocation(Phi1, Phi2);
+                                        //NaviMath::LedLocation led_colation = _navi_math.GetLedLocation(Phi2, Phi1);
                                 
+                                NaviMath::LedLocation led_colation = _navi_math.GetLedLocation(Phi1 - _CamLocation.diff_cam_led - _CamLocation.cam12, Phi2 - _CamLocation.diff_cam_led + _CamLocation.cam21 - M_PI);
+
                                 if (isnormal(led_colation.x1) && isnormal(led_colation.y1)) {
 
 
                                     if (isBeginMakeJson_coordinates) {
                                         isBeginMakeJson_coordinates = false;
-                                                ss << "{\"id\":" << id 
-                                                        << ", \"dx\": " << led_colation.x1 
-                                                        << ", \"dy\": " << led_colation.y1 
-                                                        <<", \"Phi1\": " << (180.0f * Phi1) / 3.14f 
-                                                        <<", \"Phi2\": " << (180.0f * Phi2) / 3.14f 
-                                                        << "}";
+                                                ss << "{\"id\":" << id
+                                                << ", \"dx\": " << led_colation.x1
+                                                << ", \"dy\": " << led_colation.y1
+                                                << ", \"Phi1\": " << (180.0f * Phi1) / 3.14f
+                                                << ", \"Phi2\": " << (180.0f * Phi2) / 3.14f
+                                                << "}";
                                     } else {
                                         //ss << ",{\"id\":" << id << ", \"dx\": " << led_colation.x1 << ", \"dy\": " << led_colation.y1 << "}";
-                                        ss << ",{\"id\":" << id 
-                                                        << ", \"dx\": " << led_colation.x1 
-                                                        << ", \"dy\": " << led_colation.y1 
-                                                        <<", \"Phi1\": " << (180.0f * Phi1) / 3.14f
-                                                        <<", \"Phi2\": " << (180.0f * Phi2) / 3.14f
-                                                        << "}";
+                                        ss << ",{\"id\":" << id
+                                                << ", \"dx\": " << led_colation.x1
+                                                << ", \"dy\": " << led_colation.y1
+                                                << ", \"Phi1\": " << (180.0f * Phi1) / 3.14f
+                                                << ", \"Phi2\": " << (180.0f * Phi2) / 3.14f
+                                                << "}";
                                     }
                                 }
                             }
@@ -236,9 +238,9 @@ void MainSingle::InitRemoteBeacons(string json) {
             }
 
 
-            if (!isOnePoint) {               
-                        ss << "{\"id\": 0, \"dx\": -1, \"dy\": -1}";
-            } 
+            if (!isOnePoint) {
+                ss << "{\"id\": 0, \"dx\": -1, \"dy\": -1}";
+            }
 
             ss << "]";
                     ss.flush();
@@ -306,10 +308,10 @@ void MainSingle::Calc() {
 
     //NaviMath::CamLocation _CamLocation = _navi_math.GetCameraLocation(alpha1, beta1, alpha2, beta2, base);
     NaviMath::CamLocation _CamLocation;
-    _CamLocation.x1=0;
-    _CamLocation.y1=0;
-    _CamLocation.x2=921.0f;
-    _CamLocation.y2=0;
+    _CamLocation.x1 = 0;
+    _CamLocation.y1 = 0;
+    _CamLocation.x2 = 1580.0f; //921.0f;
+    _CamLocation.y2 = 0;
 
     cout << "CamLocation.x1 : " << _CamLocation.x1 << ", y1: " << _CamLocation.y1 << endl;
     cout << "CamLocation.x2 : " << _CamLocation.x2 << ", y2: " << _CamLocation.y2 << endl;
@@ -338,165 +340,165 @@ void MainSingle::Calc() {
     ss_calibration.flush();
 }
 
-void MainSingle::StartCalibrationCamera() {
-    Message m;
-    char rx[100];
-
-    m.setHeader(Message::CMD_INIT_CAMERA);
-
-    double c1_alpha1;
-    double c1_beta1; //-
-    double c1_alpha2;
-    double c1_beta2; //-
-    double c1_alpha3;
-    double c1_beta3; //-
-
-    double alpha1; // abs(c1_alpha1 - c1_alpha2)
-    double beta1; // abs(c1_alpha2 - c1_alpha3)
-
-    double c2_alpha1;
-    double c2_beta1; //-
-    double c2_alpha2;
-    double c2_beta2; //-
-    double c2_alpha3;
-    double c2_beta3; //-
-
-    double alpha2; // abs(c2_alpha1 - c2_alpha2)
-    double beta2; // abs(c2_alpha2 - c2_alpha3)
-
-    double base = 20.0f;
-
-    uint8_t isCalibratio = 0;
-
-    enum {
-        isCalibratioCam1 = 1, isCalibratioCam2 = 2, isCalibratioCamAll = 3
-    };
-
-    ss_calibration.str("");
-    ss_calibration.clear();
-    ss_calibration << "\"calibration\": {";
-
-    //    ss_calibration
-    //            << "\"c1_alpha1\": " << c1_alpha1 << ", "
-    //            << "\"c1_beta1\": " << c1_beta1 << ", "
-    //            << "\"c1_alpha2\": " << c1_alpha2 << ", "
-    //            << "\"c1_beta2\": " << c1_beta2 << ", "
-    //            << "\"c1_alpha3\": " << c1_alpha3 << ", "
-    //            << "\"c1_beta3\": " << c1_beta3 << ", "
-    //            << "\"c2_alpha1\": " << c2_alpha1 << ", "
-    //            << "\"c2_beta1\": " << c2_beta1 << ", "
-    //            << "\"c2_alpha2\": " << c2_alpha2 << ", "
-    //            << "\"c2_beta2\": " << c2_beta2 << ", "
-    //            << "\"c2_alpha3\": " << c2_alpha3 << ", "
-    //            << "\"c2_beta3\": " << c2_beta3 << ", "
-    //            << "\"CamLocation.x1\": " << 1 << ", "
-    //            << "\"CamLocation.y1\": " << 2 << ", "
-    //            << "\"CamLocation.x2\": " << 3 << ", "
-    //            << "\"CamLocation.y2\": " << 4 << "}";
-    //    ss_calibration.flush();
-    //cout << ss_calibration.str() << endl;
-    //setSensors(ss_calibration.str());
-
-    for (auto b : _remore_beacons) {
-
-        if (b.type == 2) {
-            //size_t len = SendMesageToTCPServer(b.ip, b.port, m);
-            m.setHeader(Message::CMD_INIT_CAMERA);
-            bool isOk = SendMesageToTCPServer(b.ip, b.port, m);
-
-            if (b.status == isCalibratioCam1 && isOk) {
-
-                c1_alpha1 = _points_from_camera[0].alpha;
-                c1_beta1 = _points_from_camera[0].beta;
-                c1_alpha2 = _points_from_camera[1].alpha;
-                c1_beta2 = _points_from_camera[1].beta;
-                c1_alpha3 = _points_from_camera[2].alpha;
-                c1_beta3 = _points_from_camera[2].beta;
-
-                alpha1 = abs(c1_alpha1 - c1_alpha2);
-                beta1 = abs(c1_alpha2 - c1_alpha3);
-
-                isCalibratio |= b.status;
-
-
-                cout << "c1_alpha1: " << c1_alpha1
-                        << ", c1_beta1: " << c1_beta1
-                        << ", c1_alpha2: " << c1_alpha2
-                        << ", c1_beta2: " << c1_beta2
-                        << ", c1_alpha3: " << c1_alpha3
-                        << ", c1_beta3: " << c1_beta3
-                        << endl;
-
-                //cout << endl;
-                //                    for (auto i : _points_from_camera) {
-                //                        cout << " | alpha: " << i.alpha << "| beta" << i.beta << endl;
-                //                    }
-
-            } else if (b.status == isCalibratioCam2 && isOk) {
-                c2_alpha1 = _points_from_camera[0].alpha;
-                c2_beta1 = _points_from_camera[0].beta;
-                c2_alpha2 = _points_from_camera[1].alpha;
-                c2_beta2 = _points_from_camera[1].beta;
-                c2_alpha3 = _points_from_camera[2].alpha;
-                c2_beta3 = _points_from_camera[2].beta;
-
-                cout << "c2_alpha1: " << c2_alpha1
-                        << ", c2_beta1: " << c2_beta1
-                        << ", c2_alpha2: " << c2_alpha2
-                        << ", c2_beta2: " << c2_beta2
-                        << ", c2_alpha3: " << c2_alpha3
-                        << ", c2_beta3: " << c2_beta3
-                        << endl;
-
-                alpha2 = abs(c2_alpha1 - c2_alpha2);
-                beta2 = abs(c2_alpha2 - c2_alpha3);
-
-                isCalibratio |= b.status;
-            }
-
-
-            if (isCalibratio == isCalibratioCamAll) {
-                NaviMath::CamLocation _CamLocation = _navi_math.GetCameraLocation(alpha1, beta1, alpha2, beta2, base);
-
-                cout << "CamLocation.x1 : " << _CamLocation.x1 << ", y1: " << _CamLocation.y1 << endl;
-                cout << "CamLocation.x2 : " << _CamLocation.x2 << ", y2: " << _CamLocation.y2 << endl;
-
-                _navi_math.SetCamLocation(_CamLocation);
-                isCalibratio = 0;
-
-
-                ss_calibration
-                        << "\"c1_alpha1\": " << c1_alpha1 << ", "
-                        << "\"c1_beta1\": " << c1_beta1 << ", "
-                        << "\"c1_alpha2\": " << c1_alpha2 << ", "
-                        << "\"c1_beta2\": " << c1_beta2 << ", "
-                        << "\"c1_alpha3\": " << c1_alpha3 << ", "
-                        << "\"c1_beta3\": " << c1_beta3 << ", "
-                        << "\"c2_alpha1\": " << c2_alpha1 << ", "
-                        << "\"c2_beta1\": " << c2_beta1 << ", "
-                        << "\"c2_alpha2\": " << c2_alpha2 << ", "
-                        << "\"c2_beta2\": " << c2_beta2 << ", "
-                        << "\"c2_alpha3\": " << c2_alpha3 << ", "
-                        << "\"c2_beta3\": " << c2_beta3 << ", "
-                        << "\"CamLocation.x1\": " << _CamLocation.x1 << ", "
-                        << "\"CamLocation.y1\": " << _CamLocation.y1 << ", "
-                        << "\"CamLocation.x2\": " << _CamLocation.x2 << ", "
-                        << "\"CamLocation.y2\": " << _CamLocation.y2 << "}";
-
-                ss_calibration.flush();
-
-
-                //cout << ss_calibration.str() << endl;
-                //setSensors(ss_calibration.str());
-            }
-
-
-
-            sleep(delay_processing);
-        }
-    }
-
-}
+//void MainSingle::StartCalibrationCamera() {
+//    Message m;
+//    char rx[100];
+//
+//    m.setHeader(Message::CMD_INIT_CAMERA);
+//
+//    double c1_alpha1;
+//    double c1_beta1; //-
+//    double c1_alpha2;
+//    double c1_beta2; //-
+//    double c1_alpha3;
+//    double c1_beta3; //-
+//
+//    double alpha1; // abs(c1_alpha1 - c1_alpha2)
+//    double beta1; // abs(c1_alpha2 - c1_alpha3)
+//
+//    double c2_alpha1;
+//    double c2_beta1; //-
+//    double c2_alpha2;
+//    double c2_beta2; //-
+//    double c2_alpha3;
+//    double c2_beta3; //-
+//
+//    double alpha2; // abs(c2_alpha1 - c2_alpha2)
+//    double beta2; // abs(c2_alpha2 - c2_alpha3)
+//
+//    double base = 20.0f;
+//
+//    uint8_t isCalibratio = 0;
+//
+//    enum {
+//        isCalibratioCam1 = 1, isCalibratioCam2 = 2, isCalibratioCamAll = 3
+//    };
+//
+//    ss_calibration.str("");
+//    ss_calibration.clear();
+//    ss_calibration << "\"calibration\": {";
+//
+//    //    ss_calibration
+//    //            << "\"c1_alpha1\": " << c1_alpha1 << ", "
+//    //            << "\"c1_beta1\": " << c1_beta1 << ", "
+//    //            << "\"c1_alpha2\": " << c1_alpha2 << ", "
+//    //            << "\"c1_beta2\": " << c1_beta2 << ", "
+//    //            << "\"c1_alpha3\": " << c1_alpha3 << ", "
+//    //            << "\"c1_beta3\": " << c1_beta3 << ", "
+//    //            << "\"c2_alpha1\": " << c2_alpha1 << ", "
+//    //            << "\"c2_beta1\": " << c2_beta1 << ", "
+//    //            << "\"c2_alpha2\": " << c2_alpha2 << ", "
+//    //            << "\"c2_beta2\": " << c2_beta2 << ", "
+//    //            << "\"c2_alpha3\": " << c2_alpha3 << ", "
+//    //            << "\"c2_beta3\": " << c2_beta3 << ", "
+//    //            << "\"CamLocation.x1\": " << 1 << ", "
+//    //            << "\"CamLocation.y1\": " << 2 << ", "
+//    //            << "\"CamLocation.x2\": " << 3 << ", "
+//    //            << "\"CamLocation.y2\": " << 4 << "}";
+//    //    ss_calibration.flush();
+//    //cout << ss_calibration.str() << endl;
+//    //setSensors(ss_calibration.str());
+//
+//    for (auto b : _remore_beacons) {
+//
+//        if (b.type == 2) {
+//            //size_t len = SendMesageToTCPServer(b.ip, b.port, m);
+//            m.setHeader(Message::CMD_INIT_CAMERA);
+//            bool isOk = SendMesageToTCPServer(b.ip, b.port, m);
+//
+//            if (b.status == isCalibratioCam1 && isOk) {
+//
+//                c1_alpha1 = _points_from_camera[0].alpha;
+//                c1_beta1 = _points_from_camera[0].beta;
+//                c1_alpha2 = _points_from_camera[1].alpha;
+//                c1_beta2 = _points_from_camera[1].beta;
+//                c1_alpha3 = _points_from_camera[2].alpha;
+//                c1_beta3 = _points_from_camera[2].beta;
+//
+//                alpha1 = abs(c1_alpha1 - c1_alpha2);
+//                beta1 = abs(c1_alpha2 - c1_alpha3);
+//
+//                isCalibratio |= b.status;
+//
+//
+//                cout << "c1_alpha1: " << c1_alpha1
+//                        << ", c1_beta1: " << c1_beta1
+//                        << ", c1_alpha2: " << c1_alpha2
+//                        << ", c1_beta2: " << c1_beta2
+//                        << ", c1_alpha3: " << c1_alpha3
+//                        << ", c1_beta3: " << c1_beta3
+//                        << endl;
+//
+//                //cout << endl;
+//                //                    for (auto i : _points_from_camera) {
+//                //                        cout << " | alpha: " << i.alpha << "| beta" << i.beta << endl;
+//                //                    }
+//
+//            } else if (b.status == isCalibratioCam2 && isOk) {
+//                c2_alpha1 = _points_from_camera[0].alpha;
+//                c2_beta1 = _points_from_camera[0].beta;
+//                c2_alpha2 = _points_from_camera[1].alpha;
+//                c2_beta2 = _points_from_camera[1].beta;
+//                c2_alpha3 = _points_from_camera[2].alpha;
+//                c2_beta3 = _points_from_camera[2].beta;
+//
+//                cout << "c2_alpha1: " << c2_alpha1
+//                        << ", c2_beta1: " << c2_beta1
+//                        << ", c2_alpha2: " << c2_alpha2
+//                        << ", c2_beta2: " << c2_beta2
+//                        << ", c2_alpha3: " << c2_alpha3
+//                        << ", c2_beta3: " << c2_beta3
+//                        << endl;
+//
+//                alpha2 = abs(c2_alpha1 - c2_alpha2);
+//                beta2 = abs(c2_alpha2 - c2_alpha3);
+//
+//                isCalibratio |= b.status;
+//            }
+//
+//
+//            if (isCalibratio == isCalibratioCamAll) {
+//                //NaviMath::CamLocation _CamLocation = _navi_math.GetCameraLocation(alpha1, beta1, alpha2, beta2, base);
+//
+//                cout << "CamLocation.x1 : " << _CamLocation.x1 << ", y1: " << _CamLocation.y1 << endl;
+//                cout << "CamLocation.x2 : " << _CamLocation.x2 << ", y2: " << _CamLocation.y2 << endl;
+//
+//                _navi_math.SetCamLocation(_CamLocation);
+//                isCalibratio = 0;
+//
+//
+//                ss_calibration
+//                        << "\"c1_alpha1\": " << c1_alpha1 << ", "
+//                        << "\"c1_beta1\": " << c1_beta1 << ", "
+//                        << "\"c1_alpha2\": " << c1_alpha2 << ", "
+//                        << "\"c1_beta2\": " << c1_beta2 << ", "
+//                        << "\"c1_alpha3\": " << c1_alpha3 << ", "
+//                        << "\"c1_beta3\": " << c1_beta3 << ", "
+//                        << "\"c2_alpha1\": " << c2_alpha1 << ", "
+//                        << "\"c2_beta1\": " << c2_beta1 << ", "
+//                        << "\"c2_alpha2\": " << c2_alpha2 << ", "
+//                        << "\"c2_beta2\": " << c2_beta2 << ", "
+//                        << "\"c2_alpha3\": " << c2_alpha3 << ", "
+//                        << "\"c2_beta3\": " << c2_beta3 << ", "
+//                        << "\"CamLocation.x1\": " << _CamLocation.x1 << ", "
+//                        << "\"CamLocation.y1\": " << _CamLocation.y1 << ", "
+//                        << "\"CamLocation.x2\": " << _CamLocation.x2 << ", "
+//                        << "\"CamLocation.y2\": " << _CamLocation.y2 << "}";
+//
+//                ss_calibration.flush();
+//
+//
+//                //cout << ss_calibration.str() << endl;
+//                //setSensors(ss_calibration.str());
+//            }
+//
+//
+//
+//            sleep(delay_processing);
+//        }
+//    }
+//
+//}
 
 void MainSingle::Init() {
     InitWebServer(8080);
@@ -652,27 +654,36 @@ void MainSingle::TestCalibrationCamera() {
 
     m.setHeader(Message::CMD_INIT_CAMERA);
 
-    double c1_alpha1;
-    double c1_beta1; //-
-    double c1_alpha2;
-    double c1_beta2; //-
-    double c1_alpha3;
-    double c1_beta3; //-
+    //    double c1_alpha1;
+    //    double c1_beta1; //-
+    //    double c1_alpha2;
+    //    double c1_beta2; //-
+    //    double c1_alpha3;
+    //    double c1_beta3; //-
 
-    double alpha1; // abs(c1_alpha1 - c1_alpha2)
-    double beta1; // abs(c1_alpha2 - c1_alpha3)
+    //    double alpha1; // abs(c1_alpha1 - c1_alpha2)
+    //    double beta1; // abs(c1_alpha2 - c1_alpha3)
 
-    double c2_alpha1;
-    double c2_beta1; //-
-    double c2_alpha2;
-    double c2_beta2; //-
-    double c2_alpha3;
-    double c2_beta3; //-
+    //    double c2_alpha1;
+    //    double c2_beta1; //-
+    //    double c2_alpha2;
+    //    double c2_beta2; //-
+    //    double c2_alpha3;
+    //    double c2_beta3; //-
 
-    double alpha2; // abs(c2_alpha1 - c2_alpha2)
-    double beta2; // abs(c2_alpha2 - c2_alpha3)
 
-    double base = 986.0f;
+    double Fi_c1_c2;
+    double Fi_c1_l1;
+    double Fi_c1_l2;
+    double Fi_c2_c1;
+    double Fi_c2_l1;
+    double Fi_c2_l2;
+
+
+    //    double alpha2; // abs(c2_alpha1 - c2_alpha2)
+    //    double beta2; // abs(c2_alpha2 - c2_alpha3)
+
+    double base = 660.0f;
 
     uint8_t isCalibratio = 0;
 
@@ -713,13 +724,41 @@ void MainSingle::TestCalibrationCamera() {
                 m.setHeader(Message::CMD_INIT_CAMERA);
                 isOk = SendMesageToTCPServer(b.ip, b.port, m);
 
-                if (_points_from_camera.size() == 3) {
+                if (_points_from_camera.size() >= 3) {
 
                     sort(_points_from_camera.begin(), _points_from_camera.end(),
                             [](const C_Point & a, const C_Point & b) -> bool {
                                 //return a.alpha < b.alpha;
                                 return a.alpha > b.alpha;
                             });
+
+
+                    cout << "Sort : ";
+                    for (auto i : _points_from_camera) {
+
+                        cout << i.alpha << " ";
+                    }
+
+                    if (_points_from_camera.size() > 3) {
+                        for (int i = 0; i < _points_from_camera.size(); i++) {
+                            for (int j = i+1; j < _points_from_camera.size(); j++) {
+
+                                if ((_points_from_camera[i].alpha > 0 && _points_from_camera[j].alpha > 0) || (_points_from_camera[i].alpha < 0 && _points_from_camera[j].alpha < 0))
+                                    if (abs(_points_from_camera[i].alpha - _points_from_camera[j].alpha) < 0.1f) {
+                                        _points_from_camera.erase(_points_from_camera.begin() + j);
+                                    }
+
+                            }
+                        }
+
+                        cout << "Erase : ";
+                        for (auto i : _points_from_camera) {
+
+                            cout << i.alpha << " ";
+                        }
+                    }
+
+                    cout << endl;
 
                     break;
                 }
@@ -729,29 +768,33 @@ void MainSingle::TestCalibrationCamera() {
 
 
 
-            if (b.status == isCalibratioCam1 && isOk) {
+            if (b.status == isCalibratioCam1 && isOk && _points_from_camera.size() == 3) {
 
-                c1_alpha1 = _points_from_camera[0].alpha;
-                c1_beta1 = _points_from_camera[0].beta;
-                c1_alpha2 = _points_from_camera[1].alpha;
-                c1_beta2 = _points_from_camera[1].beta;
-                c1_alpha3 = _points_from_camera[2].alpha;
-                c1_beta3 = _points_from_camera[2].beta;
+                //                c1_alpha1 = _points_from_camera[0].alpha;
+                //                c1_beta1 = _points_from_camera[0].beta;
+                //                c1_alpha2 = _points_from_camera[1].alpha;
+                //                c1_beta2 = _points_from_camera[1].beta;
+                //                c1_alpha3 = _points_from_camera[2].alpha;
+                //                c1_beta3 = _points_from_camera[2].beta;
+
+
+                Fi_c1_l1 = _points_from_camera[0].alpha;
+                Fi_c1_l2 = _points_from_camera[1].alpha;
+                Fi_c1_c2 = _points_from_camera[2].alpha;
+
+
 
                 //alpha1 = abs(c1_alpha1 - c1_alpha2);
                 //beta1 = abs(c1_alpha2 - c1_alpha3);
-                alpha1 = c1_alpha1 - c1_alpha2;
-                beta1 = c1_alpha2 - c1_alpha3;
+                //                alpha1 = c1_alpha1 - c1_alpha2;
+                //                beta1 = c1_alpha2 - c1_alpha3;
 
                 isCalibratio |= b.status;
 
 
-                cout << "c1_alpha1: " << c1_alpha1
-                        << ", c1_beta1: " << c1_beta1
-                        << ", c1_alpha2: " << c1_alpha2
-                        << ", c1_beta2: " << c1_beta2
-                        << ", c1_alpha3: " << c1_alpha3
-                        << ", c1_beta3: " << c1_beta3
+                cout << "Fi_c1_l1: " << Fi_c1_l1
+                        << ", Fi_c1_l2: " << Fi_c1_l2
+                        << ", Fi_c1_c2: " << Fi_c1_c2
                         << endl;
 
                 //cout << endl;
@@ -759,26 +802,29 @@ void MainSingle::TestCalibrationCamera() {
                 //                        cout << " | alpha: " << i.alpha << "| beta" << i.beta << endl;
                 //                    }
 
-            } else if (b.status == isCalibratioCam2 && isOk) {
-                c2_alpha1 = _points_from_camera[0].alpha;
-                c2_beta1 = _points_from_camera[0].beta;
-                c2_alpha2 = _points_from_camera[1].alpha;
-                c2_beta2 = _points_from_camera[1].beta;
-                c2_alpha3 = _points_from_camera[2].alpha;
-                c2_beta3 = _points_from_camera[2].beta;
+            } else if (b.status == isCalibratioCam2 && isOk && _points_from_camera.size() == 3) {
+                //                c2_alpha1 = _points_from_camera[0].alpha;
+                //                c2_beta1 = _points_from_camera[0].beta;
+                //                c2_alpha2 = _points_from_camera[1].alpha;
+                //                c2_beta2 = _points_from_camera[1].beta;
+                //                c2_alpha3 = _points_from_camera[2].alpha;
+                //                c2_beta3 = _points_from_camera[2].beta;
 
-                cout << "c2_alpha1: " << c2_alpha1
-                        << ", c2_beta1: " << c2_beta1
-                        << ", c2_alpha2: " << c2_alpha2
-                        << ", c2_beta2: " << c2_beta2
-                        << ", c2_alpha3: " << c2_alpha3
-                        << ", c2_beta3: " << c2_beta3
+
+                Fi_c2_c1 = _points_from_camera[0].alpha;
+                Fi_c2_l1 = _points_from_camera[1].alpha;
+                Fi_c2_l2 = _points_from_camera[2].alpha;
+
+
+                cout << "Fi_c2_c1: " << Fi_c2_c1
+                        << ", Fi_c2_l1: " << Fi_c2_l1
+                        << ", Fi_c2_l2: " << Fi_c2_l2
                         << endl;
 
                 //alpha2 = abs(c2_alpha1 - c2_alpha2);
                 //beta2 = abs(c2_alpha2 - c2_alpha3);
-                alpha2 = c2_alpha1 - c2_alpha2;
-                beta2 = c2_alpha2 - c2_alpha3;
+                //                alpha2 = c2_alpha1 - c2_alpha2;
+                //                beta2 = c2_alpha2 - c2_alpha3;
 
                 isCalibratio |= b.status;
             }
@@ -786,8 +832,26 @@ void MainSingle::TestCalibrationCamera() {
 
             if (isCalibratio == isCalibratioCamAll) {
                 //NaviMath::CamLocation _CamLocation = _navi_math.GetCameraLocation(alpha1, beta1, alpha2, beta2, base);
-                NaviMath::CamLocation _CamLocation = _navi_math.GetCameraLocation(alpha1, beta1, beta2, alpha2, base);
+                //!NaviMath::CamLocation _CamLocation = _navi_math.GetCameraLocation(alpha1, beta1, beta2, alpha2, base);
                 //NaviMath::CamLocation _CamLocation = _navi_math.GetCameraLocation( beta1, alpha1, beta2, alpha2, base);
+
+                /*
+                 * c1
+                 * 0 - L1
+                 * 1 - L2
+                 * 2 - C2
+                 * 
+                 * c2
+                 * 0 - C1
+                 * 1 - L1
+                 * 2 - L2
+                 * 
+                 */
+
+
+
+                _CamLocation = _navi_math.GetCameraLocation(Fi_c1_c2, Fi_c1_l1, Fi_c1_l2, Fi_c2_c1, Fi_c2_l1, Fi_c2_l2, base);
+
 
                 cout << "CamLocation.x1 : " << _CamLocation.x1 << ", y1: " << _CamLocation.y1 << endl;
                 cout << "CamLocation.x2 : " << _CamLocation.x2 << ", y2: " << _CamLocation.y2 << endl;
@@ -797,28 +861,18 @@ void MainSingle::TestCalibrationCamera() {
 
 
                 ss_calibration
-                        << "\"c1_alpha1\": " << c1_alpha1 << ", "
-                        << "\"c1_beta1\": " << c1_beta1 << ", "
-                        << "\"c1_alpha2\": " << c1_alpha2 << ", "
-                        << "\"c1_beta2\": " << c1_beta2 << ", "
-                        << "\"c1_alpha3\": " << c1_alpha3 << ", "
-                        << "\"c1_beta3\": " << c1_beta3 << ", "
-                        << "\"c2_alpha1\": " << c2_alpha1 << ", "
-                        << "\"c2_beta1\": " << c2_beta1 << ", "
-                        << "\"c2_alpha2\": " << c2_alpha2 << ", "
-                        << "\"c2_beta2\": " << c2_beta2 << ", "
-                        << "\"c2_alpha3\": " << c2_alpha3 << ", "
-                        << "\"c2_beta3\": " << c2_beta3 << ", "
-                        
-                        << "\"diff_alpha1\": " << alpha1 << ", "
-                        << "\"diff_beta1\": " << beta1 << ", "
-                        << "\"diff_alpha2\": " << alpha2 << ", "
-                        << "\"diff_beta2\": " << beta2 << ", "
-                        
+                        << "\"Fi_c1_c2\": " << Fi_c1_c2 << ", "
+                        << "\"Fi_c1_l1\": " << Fi_c1_l1 << ", "
+                        << "\"Fi_c1_l2\": " << Fi_c1_l2 << ", "
+                        << "\"Fi_c2_c1\": " << Fi_c2_c1 << ", "
+                        << "\"Fi_c2_l1\": " << Fi_c2_l1 << ", "
+                        << "\"Fi_c2_l2\": " << Fi_c2_l2 << ", "
+                        << "\"CamLocation.diff_cam_led\": " << _CamLocation.diff_cam_led << ", "
                         << "\"CamLocation.x1\": " << _CamLocation.x1 << ", "
                         << "\"CamLocation.y1\": " << _CamLocation.y1 << ", "
                         << "\"CamLocation.x2\": " << _CamLocation.x2 << ", "
                         << "\"CamLocation.y2\": " << _CamLocation.y2 << "}";
+
 
                 ss_calibration.flush();
 
@@ -832,7 +886,7 @@ void MainSingle::TestCalibrationCamera() {
             sleep(delay_processing);
         }
     }
-    
+
     beacon.data[0] = 0;
     beacon.data[1] = 0;
     for (auto b : _remore_beacons) {

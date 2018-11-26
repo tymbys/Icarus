@@ -56,6 +56,7 @@ private:
     POINTS _points_from_camera;
     
     NaviMath _navi_math;
+    NaviMath::CamLocation _CamLocation;
 };
 
 #endif /* MAINSINGLE_H */
