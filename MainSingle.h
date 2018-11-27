@@ -26,6 +26,7 @@ public:
     void InitRemoteBeacons(string json);
     void StartCalibrationCamera();
     void TestCalibrationCamera();
+    void TestCalibrationCamera_2points() ;
     
     void Init();
     
@@ -37,6 +38,8 @@ public:
     void ConvertDataToPoints(TCPClient &c);
     
     void Calc();
+    
+    void prepare_points_1point();
     
 private:
     thread _web_server;

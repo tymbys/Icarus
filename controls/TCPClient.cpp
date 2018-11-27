@@ -178,8 +178,8 @@ void TCPClient::do_write() {
 
     //boost::asio::write(socket_, boost::asio::buffer(&write_msgs_.front(), sizeof(Beacon)));
     boost::asio::write(socket_, boost::asio::buffer(m.data(), sizeof (m.length())));
-    do_read_body();
-    //socket_.close();
+    //do_read_body();
+    socket_.close();
 
 
 }
