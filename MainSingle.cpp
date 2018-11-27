@@ -178,7 +178,7 @@ void MainSingle::InitRemoteBeacons(string json) {
                                         //!NaviMath::LedLocation led_colation = _navi_math.GetLedLocation(Phi1, Phi2);
                                         //NaviMath::LedLocation led_colation = _navi_math.GetLedLocation(Phi2, Phi1);
                                 
-                                NaviMath::LedLocation led_colation = _navi_math.GetLedLocation(Phi1 - _CamLocation.diff_cam_led - _CamLocation.cam12, Phi2 - _CamLocation.diff_cam_led + _CamLocation.cam21 - M_PI);
+                                NaviMath::LedLocation led_colation = _navi_math.GetLedLocation(Phi1 + _CamLocation.diff_cam_led - _CamLocation.cam12, Phi2 + _CamLocation.diff_cam_led - _CamLocation.cam21 - M_PI);
 
                                 if (isnormal(led_colation.x1) && isnormal(led_colation.y1)) {
 
@@ -683,7 +683,7 @@ void MainSingle::TestCalibrationCamera() {
     //    double alpha2; // abs(c2_alpha1 - c2_alpha2)
     //    double beta2; // abs(c2_alpha2 - c2_alpha3)
 
-    double base = 660.0f;
+    double base = 1029.0f;
 
     uint8_t isCalibratio = 0;
 
@@ -711,13 +711,15 @@ void MainSingle::TestCalibrationCamera() {
         }
     }
 
+    while (isCalibratio != isCalibratioCamAll) {
+    
     for (auto b : _remore_beacons) {
 
 
         if (b.type == 2) {
             //size_t len = SendMesageToTCPServer(b.ip, b.port, m);
             bool isOk;
-            while (1) {
+            //while (1) {
 
                 cout << "Probe calibration cam: " << b.ip << endl;
 
@@ -744,7 +746,7 @@ void MainSingle::TestCalibrationCamera() {
                             for (int j = i+1; j < _points_from_camera.size(); j++) {
 
                                 if ((_points_from_camera[i].alpha > 0 && _points_from_camera[j].alpha > 0) || (_points_from_camera[i].alpha < 0 && _points_from_camera[j].alpha < 0))
-                                    if (abs(_points_from_camera[i].alpha - _points_from_camera[j].alpha) < 0.1f) {
+                                    if (abs(_points_from_camera[i].alpha - _points_from_camera[j].alpha) < 0.01f) {
                                         _points_from_camera.erase(_points_from_camera.begin() + j);
                                     }
 
@@ -760,15 +762,17 @@ void MainSingle::TestCalibrationCamera() {
 
                     cout << endl;
 
-                    break;
+                    //break;
                 }
 
                 usleep(500000);
-            }
+            //}
 
 
 
             if (b.status == isCalibratioCam1 && isOk && _points_from_camera.size() == 3) {
+                
+                isOk = false;
 
                 //                c1_alpha1 = _points_from_camera[0].alpha;
                 //                c1_beta1 = _points_from_camera[0].beta;
@@ -803,6 +807,9 @@ void MainSingle::TestCalibrationCamera() {
                 //                    }
 
             } else if (b.status == isCalibratioCam2 && isOk && _points_from_camera.size() == 3) {
+                
+                isOk = false;
+                
                 //                c2_alpha1 = _points_from_camera[0].alpha;
                 //                c2_beta1 = _points_from_camera[0].beta;
                 //                c2_alpha2 = _points_from_camera[1].alpha;
@@ -857,7 +864,7 @@ void MainSingle::TestCalibrationCamera() {
                 cout << "CamLocation.x2 : " << _CamLocation.x2 << ", y2: " << _CamLocation.y2 << endl;
 
                 _navi_math.SetCamLocation(_CamLocation);
-                isCalibratio = 0;
+                //isCalibratio = 0;
 
 
                 ss_calibration
@@ -879,12 +886,17 @@ void MainSingle::TestCalibrationCamera() {
 
                 //cout << ss_calibration.str() << endl;
                 //setSensors(ss_calibration.str());
+                
+                break;
             }
 
 
 
             sleep(delay_processing);
         }
+        
+        
+    }
     }
 
     beacon.data[0] = 0;
