@@ -55,7 +55,10 @@ void MyHandler::onData(WebSocket* connection, const char* data) {
     beacon.data[1] = checked;
     
     m.setBody(beacon);
-    MainSingle::get().SendMesageToTCPServer(ip, port, m);
+    //MainSingle::get().SendMesageToTCPServer(ip, port, m);
+    
+    TCPClientControl tcp_client;
+    tcp_client.SendMesageToTCPServer(ip, port, m);
     
     cout << "onData: " << data << endl;
 }

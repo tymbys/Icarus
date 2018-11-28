@@ -2,7 +2,8 @@
 #define MAINSINGLE_H
 
 #include "controls/WebServer.h"
-#include "controls/TCPClient.h"
+#include "controls/TCPClientControl.h"
+
 #include "models/Beacon.h"
 #include "models/RemoteBeacon.h"
 #include "models/Message.h"
@@ -30,12 +31,12 @@ public:
     
     void Init();
     
-    bool SendMesageToTCPServer(string ip, string port, Message &mesage);
+    //bool SendMesageToTCPServer(string ip, string port, Message &mesage);
     //size_t SendMesageToTCPServer(string ip, string port, Message &mesage, char *tx_data_body, size_t tx_len , char *rx_data);
     
     thread &GetServerThread();
     void setSensors(string json);
-    void ConvertDataToPoints(TCPClient &c);
+    //void ConvertDataToPoints(TCPClient &c);
     
     void Calc();
     

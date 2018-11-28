@@ -175,7 +175,14 @@ void MainSingle::InitRemoteBeacons(string json) {
 
                 } else if (b.type == 2) {
                     m.setHeader(Message::CMD_GET_DATA_CAMERA);
-                    bool isOk = SendMesageToTCPServer(b.ip, b.port, m);
+                    
+                    
+                    //bool isOk = SendMesageToTCPServer(b.ip, b.port, m);
+                    TCPClientControl tcp_client;
+                    bool isOk = tcp_client.SendMesageToTCPServer(b.ip, b.port, m);
+                    _points_from_camera = tcp_client.GetPoints();
+                    
+                    
                     long unsigned int size = _points_from_camera.size();
                             //if (_points_from_camera.size() > 0) {
                             
@@ -574,72 +581,72 @@ void MainSingle::setSensors(string json) {
 }
 
 //size_t MainSingle::SendMesageToTCPServer(string ip, string port, Message &mesage, char *tx_data_body, size_t tx_len, char *rx_data) {
-
-bool MainSingle::SendMesageToTCPServer(string ip, string port, Message &mesage) {
-    boost::asio::io_service io_service;
-    tcp::resolver resolver(io_service);
-    auto endpoint_iterator = resolver.resolve({ip.c_str(), port.c_str()});
-    cout << "ip: " << ip << ", port: " << port << endl;
-    //auto endpoint_iterator = resolver.resolve({"192.168.1.111", "10000"});
-    TCPClient c(io_service, endpoint_iterator);
-
-
-
-    c.write(mesage);
-    //boost::asio::write(c.get(), boost::asio::buffer(tx_data_body, tx_len));
-
-    try {
-        io_service.run();
-    } catch (...) {
-        cout << "Error conekted to " << ip << ": " << port << endl;
-        return false;
-    }
-
-    if (mesage.num_cmd() == Message::CMD_GET_DATA_CAMERA || mesage.num_cmd() == Message::CMD_INIT_CAMERA) {
-        ConvertDataToPoints(c);
-    }
-
-    return true;
-
-    /*   
-       _points_from_camera.clear();
-
-       size_t read_len = c.getReadBodyLen();
-       if (read_len > 0) {
-           char *byff = (char*) malloc(read_len);
-           c.getReadBodyData(byff);
-
-
-           cout << endl;
-           for (int i = 0; i < read_len / sizeof (C_Point); i++) {
-               C_Point *p = (C_Point *) & byff[i * sizeof (C_Point)];
-               C_Point cam;
-
-               cam.alpha = p->alpha;
-               cam.beta = p->beta;
-
-               cout << i << " | alpha: " << cam.alpha << "| beta" << cam.beta << endl;
-
-               //_points_from_camera.push_back(cam);
-               //_points_from_camera.push_back(*p);
-               _points_from_camera.push_back(*(C_Point *) & byff[i * sizeof (C_Point)]);
-           }
-
-           free(byff);
-           //        cout << endl;
-           //        for(auto i: _points_from_camera ){
-           //            cout << " | alpha: " << i.alpha << "| beta" << i.beta  << endl;
-           //        }
-       }
-    
-     */
-
-    //return c.getReadData(rx_data);
-
-
-    //    std::thread t([&io_service]() {
-    //        io_service.run(); });
-}
+//
+//bool MainSingle::SendMesageToTCPServer(string ip, string port, Message &mesage) {
+//    boost::asio::io_service io_service;
+//    tcp::resolver resolver(io_service);
+//    auto endpoint_iterator = resolver.resolve({ip.c_str(), port.c_str()});
+//    cout << "ip: " << ip << ", port: " << port << endl;
+//    //auto endpoint_iterator = resolver.resolve({"192.168.1.111", "10000"});
+//    TCPClient c(io_service, endpoint_iterator);
+//
+//
+//
+//    c.write(mesage);
+//    //boost::asio::write(c.get(), boost::asio::buffer(tx_data_body, tx_len));
+//
+//    try {
+//        io_service.run();
+//    } catch (...) {
+//        cout << "Error conekted to " << ip << ": " << port << endl;
+//        return false;
+//    }
+//
+//    if (mesage.num_cmd() == Message::CMD_GET_DATA_CAMERA || mesage.num_cmd() == Message::CMD_INIT_CAMERA) {
+//        ConvertDataToPoints(c);
+//    }
+//
+//    return true;
+//
+//    /*   
+//       _points_from_camera.clear();
+//
+//       size_t read_len = c.getReadBodyLen();
+//       if (read_len > 0) {
+//           char *byff = (char*) malloc(read_len);
+//           c.getReadBodyData(byff);
+//
+//
+//           cout << endl;
+//           for (int i = 0; i < read_len / sizeof (C_Point); i++) {
+//               C_Point *p = (C_Point *) & byff[i * sizeof (C_Point)];
+//               C_Point cam;
+//
+//               cam.alpha = p->alpha;
+//               cam.beta = p->beta;
+//
+//               cout << i << " | alpha: " << cam.alpha << "| beta" << cam.beta << endl;
+//
+//               //_points_from_camera.push_back(cam);
+//               //_points_from_camera.push_back(*p);
+//               _points_from_camera.push_back(*(C_Point *) & byff[i * sizeof (C_Point)]);
+//           }
+//
+//           free(byff);
+//           //        cout << endl;
+//           //        for(auto i: _points_from_camera ){
+//           //            cout << " | alpha: " << i.alpha << "| beta" << i.beta  << endl;
+//           //        }
+//       }
+//    
+//     */
+//
+//    //return c.getReadData(rx_data);
+//
+//
+//    //    std::thread t([&io_service]() {
+//    //        io_service.run(); });
+//}
 
 //void MainSingle::SendMesageToCamera(string ip, string port, Message &mesage) {
 //    boost::asio::io_service io_service;
@@ -663,45 +670,45 @@ bool MainSingle::SendMesageToTCPServer(string ip, string port, Message &mesage) 
 //    //    std::thread t([&io_service]() {
 //    //        io_service.run(); });
 //}
-
-void MainSingle::ConvertDataToPoints(TCPClient &c) {
-
-    //POINTS _points_from_camera;
-
-    _points_from_camera.clear();
-    size_t read_len = c.getReadBodyLen();
-
-
-    if (read_len > 0) {
-
-        printf(" > read_len: %d\n", read_len);
-
-        char *byff = (char*) malloc(read_len);
-        c.getReadBodyData(byff);
-
-
-        //cout << endl;
-        for (int i = 0; i < read_len / sizeof (C_Point); i++) {
-            C_Point *p = (C_Point *) & byff[i * sizeof (C_Point)];
-            C_Point cam;
-
-            cam.alpha = p->alpha;
-            cam.beta = p->beta;
-
-            //cout << i << " | alpha: " << cam.alpha << "| beta" << cam.beta << endl;
-
-            //_points_from_camera.push_back(cam);
-            //_points_from_camera.push_back(*p);
-            _points_from_camera.push_back(*(C_Point *) & byff[i * sizeof (C_Point)]);
-        }
-
-        free(byff);
-
-        //memcpy(msg, read_msg_, read_len);
-
-        //return read_len;
-    }
-}
+//
+//void MainSingle::ConvertDataToPoints(TCPClient &c) {
+//
+//    //POINTS _points_from_camera;
+//
+//    _points_from_camera.clear();
+//    size_t read_len = c.getReadBodyLen();
+//
+//
+//    if (read_len > 0) {
+//
+//        printf(" > read_len: %d\n", read_len);
+//
+//        char *byff = (char*) malloc(read_len);
+//        c.getReadBodyData(byff);
+//
+//
+//        //cout << endl;
+//        for (int i = 0; i < read_len / sizeof (C_Point); i++) {
+//            C_Point *p = (C_Point *) & byff[i * sizeof (C_Point)];
+//            C_Point cam;
+//
+//            cam.alpha = p->alpha;
+//            cam.beta = p->beta;
+//
+//            //cout << i << " | alpha: " << cam.alpha << "| beta" << cam.beta << endl;
+//
+//            //_points_from_camera.push_back(cam);
+//            //_points_from_camera.push_back(*p);
+//            _points_from_camera.push_back(*(C_Point *) & byff[i * sizeof (C_Point)]);
+//        }
+//
+//        free(byff);
+//
+//        //memcpy(msg, read_msg_, read_len);
+//
+//        //return read_len;
+//    }
+//}
 
 void MainSingle::TestCalibrationCamera() {
     Message m;
@@ -761,7 +768,11 @@ void MainSingle::TestCalibrationCamera() {
         if (b.type == 1) {
 
             m.setBody(beacon);
-            SendMesageToTCPServer(b.ip, b.port, m);
+            //SendMesageToTCPServer(b.ip, b.port, m);
+            
+            TCPClientControl tcp_client;
+            tcp_client.SendMesageToTCPServer(b.ip, b.port, m);
+            _points_from_camera = tcp_client.GetPoints();
 
         }
     }
@@ -779,7 +790,11 @@ void MainSingle::TestCalibrationCamera() {
                 cout << "Probe calibration cam: " << b.ip << endl;
 
                 m.setHeader(Message::CMD_INIT_CAMERA);
-                isOk = SendMesageToTCPServer(b.ip, b.port, m);
+                //isOk = SendMesageToTCPServer(b.ip, b.port, m);
+                
+                TCPClientControl tcp_client;
+                isOk = tcp_client.SendMesageToTCPServer(b.ip, b.port, m);
+                _points_from_camera = tcp_client.GetPoints();
 
                 if (_points_from_camera.size() >= 3) {
 
@@ -961,7 +976,10 @@ void MainSingle::TestCalibrationCamera() {
         if (b.type == 1) {
 
             m.setBody(beacon);
-            SendMesageToTCPServer(b.ip, b.port, m);
+            //SendMesageToTCPServer(b.ip, b.port, m);
+            TCPClientControl tcp_client;
+            tcp_client.SendMesageToTCPServer(b.ip, b.port, m);
+            _points_from_camera = tcp_client.GetPoints();
 
         }
     }
@@ -991,7 +1009,11 @@ void MainSingle::TestCalibrationCamera_2points() {
         if (b.type == 1 && b.status == 1) {
 
             m.setBody(beacon);
-            SendMesageToTCPServer(b.ip, b.port, m);
+            //SendMesageToTCPServer(b.ip, b.port, m);
+            TCPClientControl tcp_client;
+            tcp_client.SendMesageToTCPServer(b.ip, b.port, m);
+            _points_from_camera = tcp_client.GetPoints();
+            
 
         }
     }
@@ -1012,7 +1034,12 @@ void MainSingle::TestCalibrationCamera_2points() {
                 cout << "Probe calibration cam: " << b.ip << endl;
 
                 m.setHeader(Message::CMD_INIT_CAMERA);
-                isOk = SendMesageToTCPServer(b.ip, b.port, m);
+                
+                TCPClientControl tcp_client;
+                isOk = tcp_client.SendMesageToTCPServer(b.ip, b.port, m);
+                _points_from_camera = tcp_client.GetPoints();
+                
+                //isOk = SendMesageToTCPServer(b.ip, b.port, m);
 
                 if (_points_from_camera.size() >= 1) {
 
@@ -1183,7 +1210,11 @@ void MainSingle::TestCalibrationCamera_2points() {
         if (b.type == 1 && b.status == 1) {
 
             m.setBody(beacon);
-            SendMesageToTCPServer(b.ip, b.port, m);
+            
+            TCPClientControl tcp_client;
+            tcp_client.SendMesageToTCPServer(b.ip, b.port, m);
+            _points_from_camera = tcp_client.GetPoints();
+            
 
         }
     }

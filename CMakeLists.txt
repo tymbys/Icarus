@@ -17,7 +17,8 @@ find_library(SEASOCKS_LIB seasocks)
 
 file(GLOB SRC_LIST "./*.cpp" "./controls/*.cpp" "./models/*.cpp")
 
-set(seasocks_lib ${CMAKE_CURRENT_SOURCE_DIR}/rootfs/lib/libseasocks.a)
+#set(seasocks_lib ${CMAKE_CURRENT_SOURCE_DIR}/rootfs/lib/libseasocks.a)
+set(seasocks_lib /usr/local/lib/libseasocks.a)
 
 set(Boost_USE_STATIC_LIBS OFF) 
 set(Boost_USE_MULTITHREADED ON)  
