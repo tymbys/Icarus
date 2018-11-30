@@ -126,7 +126,8 @@ void MainSingle::InitRemoteBeacons(string json) {
 
     _processing_beacon_clients = thread([this]() {
 
-        double base = 1446.0f;
+        //double base = 1292.0f;
+        double base = 4102.0f ;//+ 120.0f;
 
         delay_processing = 100000;
         is_run_processing_beacon_clients = true;
@@ -987,7 +988,7 @@ void MainSingle::TestCalibrationCamera() {
 
 void MainSingle::TestCalibrationCamera_2points() {
     Message m;
-
+    Beacon beacon;
 
     uint8_t isCalibratio = 0;
 
@@ -998,9 +999,29 @@ void MainSingle::TestCalibrationCamera_2points() {
     ss_calibration.str("");
     ss_calibration.clear();
     ss_calibration << "\"calibration\": {";
+    
+    
+    
+    beacon.data[0] = 0;
+    beacon.data[1] = 0;
+
+    for (auto b : _remore_beacons) {
+
+        //if (b.type == 1 && b.status == 1) {
+        if (b.type == 1 ) {
+
+            m.setBody(beacon);
+            
+            TCPClientControl tcp_client;
+            tcp_client.SendMesageToTCPServer(b.ip, b.port, m);
+            _points_from_camera = tcp_client.GetPoints();
+            
+
+        }
+    }
 
 
-    Beacon beacon;
+//    Beacon beacon;
     beacon.data[0] = 0;
     beacon.data[1] = 1;
 
@@ -1207,7 +1228,8 @@ void MainSingle::TestCalibrationCamera_2points() {
 
     for (auto b : _remore_beacons) {
 
-        if (b.type == 1 && b.status == 1) {
+        //if (b.type == 1 && b.status == 1) {
+        if (b.type == 1 ) {
 
             m.setBody(beacon);
             

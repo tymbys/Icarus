@@ -28,12 +28,15 @@ function addrow(index, row) {
     var date_text = leftPad(d.getHours(), 2) + ":" + leftPad(d.getMinutes(), 2) + ":" + leftPad(d.getSeconds(), 2) + " " + leftPad(d.getDate(), 2) + "-" + leftPad((d.getMonth() + 1), 2) + "-" + leftPad(d.getFullYear(), 4);
 
 
+    
+    var dx = parseInt(row["dx"]);
+    var dy = parseInt(row["dy"]);
 
     $('#mtable_file tbody tr:last td:nth-child(1)').html(index);
     $('#mtable_file tbody tr:last td:nth-child(2)').html(row["id"]);
     $('#mtable_file tbody tr:last td:nth-child(3)').html(row["dx"]);
     $('#mtable_file tbody tr:last td:nth-child(4)').html(row["dy"]);
-    $('#mtable_file tbody tr:last td:nth-child(5)').html(date_text);
+    $('#mtable_file tbody tr:last td:nth-child(5)').html(Math.sqrt(dx*dx + dy*dy) +" " + date_text);
 
 }
 ;
@@ -42,10 +45,17 @@ function updaterow(row) {
     var d = new Date();
     var date_text = +leftPad(d.getHours(), 2) + ":" + leftPad(d.getMinutes(), 2) + ":" + leftPad(d.getSeconds(), 2) + " " + leftPad(d.getDate(), 2) + "-" + leftPad((d.getMonth() + 1), 2) + "-" + leftPad(d.getFullYear(), 4);
 
+
+    var dx = parseInt(row["dx"]);
+    var dy = parseInt(row["dy"]);
+    
     $("#tr_" + row["id"] + " td:nth-child(2)").html(row["id"]);
     $("#tr_" + row["id"] + " td:nth-child(3)").html(row["dx"]);
     $("#tr_" + row["id"] + " td:nth-child(4)").html(row["dy"]);
-    $("#tr_" + row["id"] + " td:nth-child(5)").html(date_text);
+    $("#tr_" + row["id"] + " td:nth-child(5)").html( Math.sqrt(dx*dx + dy*dy) +" " + date_text);
+    
+    
+    
 }
 
 function del_tr(index) {
