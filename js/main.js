@@ -28,12 +28,15 @@ function addrow(index, row) {
     var date_text = leftPad(d.getHours(), 2) + ":" + leftPad(d.getMinutes(), 2) + ":" + leftPad(d.getSeconds(), 2) + " " + leftPad(d.getDate(), 2) + "-" + leftPad((d.getMonth() + 1), 2) + "-" + leftPad(d.getFullYear(), 4);
 
 
+    
+    var dx = parseInt(row["dx"]);
+    var dy = parseInt(row["dy"]);
 
     $('#mtable_file tbody tr:last td:nth-child(1)').html(index);
     $('#mtable_file tbody tr:last td:nth-child(2)').html(row["id"]);
     $('#mtable_file tbody tr:last td:nth-child(3)').html(row["dx"]);
     $('#mtable_file tbody tr:last td:nth-child(4)').html(row["dy"]);
-    $('#mtable_file tbody tr:last td:nth-child(5)').html(date_text);
+    $('#mtable_file tbody tr:last td:nth-child(5)').html(Math.sqrt(dx*dx + dy*dy) +" " + date_text);
 
 }
 ;
@@ -42,10 +45,17 @@ function updaterow(row) {
     var d = new Date();
     var date_text = +leftPad(d.getHours(), 2) + ":" + leftPad(d.getMinutes(), 2) + ":" + leftPad(d.getSeconds(), 2) + " " + leftPad(d.getDate(), 2) + "-" + leftPad((d.getMonth() + 1), 2) + "-" + leftPad(d.getFullYear(), 4);
 
-    $("#tr_" + row["id"] +" td:nth-child(2)").html(row["id"]);
-    $("#tr_" + row["id"] +" td:nth-child(3)").html(row["dx"]);
-    $("#tr_" + row["id"] +" td:nth-child(4)").html(row["dy"]);
-    $("#tr_" + row["id"] +" td:nth-child(5)").html(date_text);
+
+    var dx = parseInt(row["dx"]);
+    var dy = parseInt(row["dy"]);
+    
+    $("#tr_" + row["id"] + " td:nth-child(2)").html(row["id"]);
+    $("#tr_" + row["id"] + " td:nth-child(3)").html(row["dx"]);
+    $("#tr_" + row["id"] + " td:nth-child(4)").html(row["dy"]);
+    $("#tr_" + row["id"] + " td:nth-child(5)").html( Math.sqrt(dx*dx + dy*dy) +" " + date_text);
+    
+    
+    
 }
 
 function del_tr(index) {
@@ -80,21 +90,21 @@ function UpdateSensor(Sensors) {
 function UpdateCalibration(Sensors) {
 
     //$("#val_calibration").val( JSON.stringify(Sensors));
-    
-    $("#c1_alpha1").html( JSON.stringify(Sensors["c1_alpha1"]));
-    $("#c1_beta1").html( JSON.stringify(Sensors["c1_beta1"]));
-    $("#c1_alpha2").html( JSON.stringify(Sensors["c1_alpha2"]));
-    $("#c1_beta2").html( JSON.stringify(Sensors["c1_beta2"]));
-    $("#c1_alpha3").html( JSON.stringify(Sensors["c1_alpha3"]));
-    $("#c1_beta3").html( JSON.stringify(Sensors["c1_beta3"]));
-    
-    $("#c2_alpha1").html( JSON.stringify(Sensors["c2_alpha1"]));
-    $("#c2_beta1").html( JSON.stringify(Sensors["c2_beta1"]));
-    $("#c2_alpha2").html( JSON.stringify(Sensors["c2_alpha2"]));
-    $("#c2_beta2").html( JSON.stringify(Sensors["c2_beta2"]));
-    $("#c2_alpha3").html( JSON.stringify(Sensors["c2_alpha3"]));
-    $("#c2_beta3").html( JSON.stringify(Sensors["c2_beta3"]));
-    
+
+    $("#c1_alpha1").html(JSON.stringify(Sensors["c1_alpha1"]));
+    $("#c1_beta1").html(JSON.stringify(Sensors["c1_beta1"]));
+    $("#c1_alpha2").html(JSON.stringify(Sensors["c1_alpha2"]));
+    $("#c1_beta2").html(JSON.stringify(Sensors["c1_beta2"]));
+    $("#c1_alpha3").html(JSON.stringify(Sensors["c1_alpha3"]));
+    $("#c1_beta3").html(JSON.stringify(Sensors["c1_beta3"]));
+
+    $("#c2_alpha1").html(JSON.stringify(Sensors["c2_alpha1"]));
+    $("#c2_beta1").html(JSON.stringify(Sensors["c2_beta1"]));
+    $("#c2_alpha2").html(JSON.stringify(Sensors["c2_alpha2"]));
+    $("#c2_beta2").html(JSON.stringify(Sensors["c2_beta2"]));
+    $("#c2_alpha3").html(JSON.stringify(Sensors["c2_alpha3"]));
+    $("#c2_beta3").html(JSON.stringify(Sensors["c2_beta3"]));
+
 
 }
 ;
@@ -145,6 +155,15 @@ function InitWebSocket()
 
 }
 
+function WebSocketSend(msg) {
+    if (!cam_socket) {
+        console.log('no connection');
+        return;
+    }
+    console.log('out:', msg);
+    cam_socket.send(msg);
+};
+
 function onOpen(evt)
 {
     writeToScreen("CAM CONNECTED");
@@ -159,7 +178,7 @@ function onMessage(evt)
     _sensors = JSON.parse(evt.data);
     UpdateSensor(_sensors["coordinates"]);
     UpdateCalibration(_sensors["calibration"]);
-    
+
 }
 function onError(evt)
 {
@@ -168,7 +187,7 @@ function onError(evt)
 
 function writeToScreen(message)
 {
-    
+
     console.log(message);
     //var pre = document.createElement("p");
     //pre.style.wordWrap = "break-word";
@@ -179,5 +198,71 @@ function writeToScreen(message)
 }
 
 
+function addbutton(index, name, ip, port) {
+    
+    var tr = $("#button_clone").clone();
+    tr.attr("id", "button_" + index);
+
+    //tr.css("opacity", "0.3");
+    //tr.css("filter", "alpha(Opacity=30)");
+
+
+    $('#button_clone').after(tr);
+    $("#button_" + index).show();
+
+    //$("#button_" + index + " input[name=led_]").text(name);
+    //$("#button_" + index + " input[name=led_]").button('refresh');
+    $("#button_" + index + " input[name=led_]").attr("id", "led_" + index);
+    $("#button_" + index + " input[name=led_]").attr("name", "led_" + index);
+    //$("#led_" + index).button('refresh');
+    
+
+    
+    $("#button_" + index + " label[name=led_label]").attr("for", "led_" + index);
+    $("#button_" + index + " label[name=led_label]").html(name);
+    
+    
+    $("#led_" + index).attr("onclick", "send_to_led(" + index +")");
+    
+    
+    $("#button_" + index + " input[name=led_ip]").attr("value", ip);
+    $("#button_" + index + " input[name=led_port]").attr("value",port);
+
+
+}
+
 
 InitWebSocket();
+
+function send_to_led(index){
+    var checked =  $("#led_"+index).prop("checked");
+    var ip =  $("#button_" + index + " input[name=led_ip]").val();
+    var port =  $("#button_" + index + " input[name=led_port]").val();
+    
+    var out={};
+    out["ip"] = ip;
+    out["port"] = port;
+    out["checked"] = checked;
+    
+    //$("#led_" + index).prop('checked', true);//.checkboxradio('refresh');
+    //$("#led_" + index).attr("checked",true).show();
+    
+    
+    WebSocketSend(JSON.stringify(out));
+    
+}
+
+
+$.getJSON("RemoteBeacons.json", function (json) {
+    console.log(json); // this will show the info it in firebug console
+
+    for (var key in json) {
+        console.log(key);
+        if (json[key].type == 1) {
+            addbutton(key, json[key].name + " : " + json[key].ip, json[key].ip,  json[key].port);    
+        }
+
+    }
+});
+
+

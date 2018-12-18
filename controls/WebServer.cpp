@@ -1,4 +1,5 @@
 #include "WebServer.h"
+#include "../MainSingle.h"
 
 MyHandler::MyHandler(MyServer* server) : _server(server), _currentValue(0) {
 }
@@ -38,7 +39,28 @@ void MyHandler::onData(WebSocket* connection, const char* data) {
     //            }
     //        }
 
-    cout << "onData " << endl;
+    std::stringstream ss;
+    ss << data;
+    ss.flush();
+    
+    boost::property_tree::ptree pt;
+    boost::property_tree::read_json(ss, pt);
+    string ip =  pt.get<std::string>("ip") ;
+    string port =  pt.get<std::string>("port") ;
+    bool checked =  pt.get<bool>("checked") ;
+    
+    Message m;
+    Beacon beacon;
+    beacon.data[0] = 0;
+    beacon.data[1] = checked;
+    
+    m.setBody(beacon);
+    //MainSingle::get().SendMesageToTCPServer(ip, port, m);
+    
+    TCPClientControl tcp_client;
+    tcp_client.SendMesageToTCPServer(ip, port, m);
+    
+    cout << "onData: " << data << endl;
 }
 
 void MyHandler::onDisconnect(WebSocket* connection) {
@@ -58,7 +80,7 @@ void MyHandler::setValue(int value) {
 void MyHandler::setValue(string value) {
     _currentSetValue = value;
     //cout  <<__func__ << endl;
-   for (auto c : _connections) {
+    for (auto c : _connections) {
         c->send(_currentSetValue.c_str());
         //cout << "_currentSetValue: " <<_currentSetValue << endl;
     }

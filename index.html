@@ -43,13 +43,22 @@
                 <div class="ui-body ui-body-a ui-corner-all" id="person" >
 
 
-
+                    
+                    <div id="button_clone" style="display: none;">
+                        
+                        <input name="led_" id="led_" type="checkbox" >
+                        <label name="led_label" for="led_">ip</label>
+                        
+                        <input name="led_ip" type="hidden" value="" />
+                        <input name="led_port" type="hidden" value=""/>
+                    </div>
+                    
                     <div id="for_calibration" style="display: none;">
                         <textarea id="val_calibration"></textarea>
                     </div>
 
 
-                    <div>
+                    <div style="display: none;">
                         <div> Calibration data: </div>
                         <table data-role="table" data-mode="reflow" class="ui-responsive table-stroke ui-responsive" style=" color: #00BFFF;">
                             <thead>

@@ -179,6 +179,8 @@ void TCPClient::do_write() {
     //boost::asio::write(socket_, boost::asio::buffer(&write_msgs_.front(), sizeof(Beacon)));
     boost::asio::write(socket_, boost::asio::buffer(m.data(), sizeof (m.length())));
     do_read_body();
+    
+    //read_len = 0;
     //socket_.close();
 
 
@@ -214,4 +216,5 @@ size_t TCPClient::getReadBodyLen() {
     if (read_len <= 0)return 0;
     else if (read_len >= sizeof (M_Header)) return read_len - sizeof (M_Header);
 }
+
 

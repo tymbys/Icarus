@@ -1,6 +1,10 @@
 #ifndef WEBSERVER_H
 #define WEBSERVER_H
 
+#include <sstream>
+#include <iostream>
+#include <boost/property_tree/json_parser.hpp>
+
 #include "seasocks/PrintfLogger.h"
 #include "seasocks/Server.h"
 #include "seasocks/StringUtil.h"
