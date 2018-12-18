@@ -127,7 +127,7 @@ void MainSingle::InitRemoteBeacons(string json) {
     _processing_beacon_clients = thread([this]() {
 
         //double base = 1292.0f;
-        double base = 4102.0f ;//+ 120.0f;
+        double base = 5000.0f;//4975.0f; //5000.0f;// 3661.0f;//3717.0f ;//+ 120.0f;
 
         delay_processing = 100000;
         is_run_processing_beacon_clients = true;
